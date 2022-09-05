@@ -9,14 +9,19 @@
 #include <SDL_opengl.h>
 #endif
 
-#include "graphic.h"
-#include "chip8.h"
+class graphic {
+public:
+    int width_px = 1280;
+    int height_px = 640;
 
-int main(int argc, char **argv) 
-{
-    graphic window;
+    bool showDisplay = true;
+    bool showProcess = true;
+    
 
-    window.setup();
+    void setup();
+    void makeDisplay();
+    void makeProcess();
 
-    return 0;
-}
+private:
+
+};
