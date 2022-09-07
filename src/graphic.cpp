@@ -9,6 +9,8 @@
 #include <SDL_opengl.h>
 #endif
 
+#include <iostream>
+
 #include "graphic.h"
 
 void graphic::setup(){
@@ -75,11 +77,15 @@ void graphic::setup(){
         ImGui::NewFrame();
 
         if(showDisplay){
-            makeDisplay();
+            makeDisplay(dispFull);
         }
         
-        if(showProcess){
+        if(showProcess && !dispFull){
             makeProcess(); 
+        }
+
+        if(showConfig && !dispFull){
+            makeConfig();
         }
 
         // Rendering
@@ -100,9 +106,16 @@ void graphic::setup(){
     SDL_Quit();
 }
 
-void graphic::makeDisplay(){
-    ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
-    ImGui::SetNextWindowPos({0, 0});
+void graphic::makeDisplay(bool dispFull){
+    if(dispFull){
+        ImGui::SetNextWindowSize({(float)width_px, (float)height_px});
+        ImGui::SetNextWindowPos({0, 0});
+    }
+    else{
+        ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
+        ImGui::SetNextWindowPos({0, 0});
+    }
+    
 
     ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
     {
@@ -119,6 +132,17 @@ void graphic::makeProcess(){
     ImGui::Begin("Processor Information", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     {
         
+    }
+    ImGui::End();
+}
+
+void graphic::makeConfig(){
+    ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 2});
+    ImGui::SetNextWindowPos({0, 320});
+
+    ImGui::Begin("Config", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+    {
+        ImGui::Checkbox("fullscreen", &dispFull);
     }
     ImGui::End();
 }

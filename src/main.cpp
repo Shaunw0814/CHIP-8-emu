@@ -16,6 +16,7 @@ int main(int argc, char **argv)
 {
     graphic window;
 
+    window.dispFull = false;
     //setup graphics
     window.setup();
 

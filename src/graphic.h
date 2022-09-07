@@ -16,11 +16,14 @@ public:
 
     bool showDisplay = true;
     bool showProcess = true;
+    bool showConfig = true;
     
+    bool dispFull = false;
 
     void setup();
-    void makeDisplay();
+    void makeDisplay(bool dispFull);
     void makeProcess();
+    void makeConfig();
 
 private:
 
