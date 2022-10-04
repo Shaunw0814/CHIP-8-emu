@@ -140,9 +140,11 @@ void graphic::makeConfig(){
     ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 320});
 
+    bool tmp = false;
     ImGui::Begin("Config", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     {
         ImGui::Checkbox("fullscreen", &dispFull);
+        ImGui::Checkbox("review", &tmp);
     }
     ImGui::End();
 }
