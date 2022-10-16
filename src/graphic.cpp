@@ -10,10 +10,10 @@
 #endif
 
 #include <iostream>
-
 #include "graphic.h"
+#include "chip8.h"
 
-void graphic::setup(){
+void graphic::setup(chip8 chip){
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
     {
         printf("Error: %s\n", SDL_GetError());
@@ -76,15 +76,15 @@ void graphic::setup(){
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
-        if(showDisplay){
-            makeDisplay(dispFull);
+        if(show_display){
+            makeDisplay(chip);
         }
         
-        if(showProcess && !dispFull){
+        if(show_process){
             makeProcess(); 
         }
 
-        if(showConfig && !dispFull){
+        if(show_config){
             makeConfig();
         }
 
@@ -106,24 +106,27 @@ void graphic::setup(){
     SDL_Quit();
 }
 
-void graphic::makeDisplay(bool dispFull){
-    if(dispFull){
-        ImGui::SetNextWindowSize({(float)width_px, (float)height_px});
-        ImGui::SetNextWindowPos({0, 0});
-    }
-    else{
-        ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
-        ImGui::SetNextWindowPos({0, 0});
-    }
+void graphic::makeDisplay(chip8 chip){
+
+    ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
+    ImGui::SetNextWindowPos({0, 0});
     
+    ImVec2 pixel_start, pixel_end;
 
     ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
     {
+        for(int i = 0; i < (int)sizeof(chip.disp); i++){
+            if(chip.disp[1] == 1){
+                pixel_start = pixel_end;
+                pixel_end.x += 10;
+                pixel_end.y += 10;
+                ImGui::GetForegroundDrawList()->AddRectFilled(pixel_start, pixel_end, IM_COL32(255, 255, 255, 255));
+            }
+        }
         
     }
     ImGui::End();
 }
-
 
 void graphic::makeProcess(){
     ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px});
@@ -140,11 +143,10 @@ void graphic::makeConfig(){
     ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 320});
 
-    bool tmp = false;
     ImGui::Begin("Config", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     {
-        ImGui::Checkbox("fullscreen", &dispFull);
-        ImGui::Checkbox("review", &tmp);
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+         1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     }
     ImGui::End();
 }

@@ -15,10 +15,14 @@
 int main(int argc, char **argv) 
 {
     graphic window;
+    chip8 chip;
 
-    window.dispFull = false;
+    chip.init();
+
     //setup graphics
-    window.setup();
+    window.setup(chip);
+
+    //emu.init();
 
     return 0;
 }
