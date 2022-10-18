@@ -9,6 +9,8 @@
 #include <SDL_opengl.h>
 #endif
 
+#include <iostream>
+
 #include "graphic.h"
 #include "chip8.h"
 
@@ -19,9 +21,15 @@ int main(int argc, char **argv)
 
     chip.init();
 
-    //setup graphics
-    window.setup(chip);
+    for(int i = 0; i < sizeof(chip.disp); i++){
+        if(chip.disp[i] != 0){
+            std::cout << chip.disp[i] << std::endl;
+        }
+    }
 
+    //setup graphics
+
+    window.setup(chip);
     //emu.init();
 
     return 0;

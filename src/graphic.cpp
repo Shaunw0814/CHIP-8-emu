@@ -113,13 +113,15 @@ void graphic::makeDisplay(chip8 chip){
     
     ImVec2 pixel_start, pixel_end;
 
-    ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+    pixel_start = pixel_end;
+    pixel_end.x += 10;
+    pixel_end.y += 10;
+
+    ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse );
     {
         for(int i = 0; i < (int)sizeof(chip.disp); i++){
-            if(chip.disp[1] == 1){
-                pixel_start = pixel_end;
-                pixel_end.x += 10;
-                pixel_end.y += 10;
+            if(chip.disp[i] != 0){
+                
                 ImGui::GetForegroundDrawList()->AddRectFilled(pixel_start, pixel_end, IM_COL32(255, 255, 255, 255));
             }
         }

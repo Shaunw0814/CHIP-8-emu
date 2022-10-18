@@ -23,7 +23,7 @@ public:
 
     //functions
     void init();
-    void clear(unsigned char* stuff);
+    void clear(unsigned char* stuff, int size);
 
 private:
 
