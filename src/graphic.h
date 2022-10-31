@@ -11,6 +11,7 @@ public:
     bool show_process = true;
     bool show_config = true;
     
+    //graphic functions
     void setup(chip8 chip);
     void makeDisplay(chip8 chip);
     void makeProcess();

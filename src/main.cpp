@@ -19,18 +19,11 @@ int main(int argc, char **argv)
     graphic window;
     chip8 chip;
 
+    //initialize
     chip.init();
 
-    for(int i = 0; i < sizeof(chip.disp); i++){
-        if(chip.disp[i] != 0){
-            std::cout << chip.disp[i] << std::endl;
-        }
-    }
-
     //setup graphics
-
     window.setup(chip);
-    //emu.init();
 
     return 0;
 }
