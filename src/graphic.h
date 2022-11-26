@@ -1,6 +1,8 @@
 #pragma once
 
 #include "chip8.h"
+#include "imgui.h"
+#include "imfilebrowser.h"
 
 class graphic {
 public:
@@ -15,7 +17,8 @@ public:
     void setup(chip8 chip);
     void makeDisplay(chip8 chip);
     void makeProcess();
-    void makeConfig();
+    void makeConfig(ImGui::FileBrowser &fileDialog);
+    void openFiles();
 
 private:
 

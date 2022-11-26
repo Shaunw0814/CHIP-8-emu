@@ -10,6 +10,7 @@
 #endif
 
 #include <iostream>
+#include "imfilebrowser.h"
 #include "graphic.h"
 #include "chip8.h"
 
@@ -41,7 +42,7 @@ void graphic::setup(chip8 chip){
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
@@ -51,6 +52,8 @@ void graphic::setup(chip8 chip){
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
+    
+    ImGui::FileBrowser fileDialog;
 
     // Main loop
     bool done = false;
@@ -75,7 +78,7 @@ void graphic::setup(chip8 chip){
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
-
+        
         if(show_display){
             makeDisplay(chip);
         }
@@ -85,7 +88,7 @@ void graphic::setup(chip8 chip){
         }
 
         if(show_config){
-            makeConfig();
+            makeConfig(fileDialog);
         }
 
         // Rendering
@@ -117,15 +120,13 @@ void graphic::makeDisplay(chip8 chip){
     pixel_end.x += 10;
     pixel_end.y += 10;
 
-    ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse );
+    ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
     {
         for(int i = 0; i < (int)sizeof(chip.disp); i++){
-            if(chip.disp[i] != 0){
-                
+            if(chip.disp[i] == 0){
                 ImGui::GetForegroundDrawList()->AddRectFilled(pixel_start, pixel_end, IM_COL32(255, 255, 255, 255));
             }
         }
-        
     }
     ImGui::End();
 }
@@ -141,13 +142,31 @@ void graphic::makeProcess(){
     ImGui::End();
 }
 
-void graphic::makeConfig(){
+void graphic::makeConfig(ImGui::FileBrowser &fileDialog){
     ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 320});
 
     ImGui::Begin("Config", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     {
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        
+        //Button for ROM choosing
+        if(ImGui::Button("Choose ROM")){
+            fileDialog.Open();
+        }
     }
     ImGui::End();
+
+    //choosing ROM file
+    fileDialog.Display();
+    if(fileDialog.HasSelected())
+    {
+        std::cout << "Selected filename " << fileDialog.GetSelected().string() << std::endl;
+        fileDialog.ClearSelected();
+    }
+}
+
+void graphic::openFiles(){
+    
+    
 }
