@@ -12,13 +12,15 @@ public:
     bool show_display = true;
     bool show_process = true;
     bool show_config = true;
-    
+
+    ImGui::FileBrowser file_dialog;
+    std::string rom_file;
+
     //graphic functions
     void setup(chip8 chip);
     void makeDisplay(chip8 chip);
     void makeProcess();
-    void makeConfig(ImGui::FileBrowser &fileDialog);
-    void openFiles();
+    void makeConfig(ImGui::FileBrowser &file_dialog, chip8 &chip);
 
 private:
 

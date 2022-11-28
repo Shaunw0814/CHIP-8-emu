@@ -23,8 +23,11 @@ public:
 
     //functions
     void init();
-    void clear(unsigned char* stuff, int size);
+    void read_rom(const char* rom_file);
 
 private:
 
+    //functions
+    void clear(unsigned char* stuff, int size);
+    
 };

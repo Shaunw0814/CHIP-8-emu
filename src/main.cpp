@@ -9,7 +9,7 @@
 #include <SDL_opengl.h>
 #endif
 
-#include <iostream>
+#include <bits/stdc++.h>
 
 #include "graphic.h"
 #include "chip8.h"

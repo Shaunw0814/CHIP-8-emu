@@ -9,7 +9,7 @@
 #include <SDL_opengl.h>
 #endif
 
-#include <iostream>
+#include <bits/stdc++.h>
 #include "imfilebrowser.h"
 #include "graphic.h"
 #include "chip8.h"
@@ -32,7 +32,7 @@ void graphic::setup(chip8 chip){
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
     SDL_Window* window = SDL_CreateWindow("test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->width_px, this->height_px, window_flags);
     SDL_GLContext gl_context = SDL_GL_CreateContext(window);
     SDL_GL_MakeCurrent(window, gl_context);
@@ -53,7 +53,6 @@ void graphic::setup(chip8 chip){
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
     
-    ImGui::FileBrowser fileDialog;
 
     // Main loop
     bool done = false;
@@ -88,7 +87,7 @@ void graphic::setup(chip8 chip){
         }
 
         if(show_config){
-            makeConfig(fileDialog);
+            makeConfig(file_dialog, chip);
         }
 
         // Rendering
@@ -142,7 +141,7 @@ void graphic::makeProcess(){
     ImGui::End();
 }
 
-void graphic::makeConfig(ImGui::FileBrowser &fileDialog){
+void graphic::makeConfig(ImGui::FileBrowser &file_dialog, chip8 &chip){
     ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 320});
 
@@ -152,21 +151,21 @@ void graphic::makeConfig(ImGui::FileBrowser &fileDialog){
         
         //Button for ROM choosing
         if(ImGui::Button("Choose ROM")){
-            fileDialog.Open();
+            file_dialog.Open();
         }
+        const char* rom_print = rom_file == "" ? "(null)" : rom_file.c_str();
+        ImGui::Text("Rom Path: %s", rom_print);
     }
     ImGui::End();
 
     //choosing ROM file
-    fileDialog.Display();
-    if(fileDialog.HasSelected())
-    {
-        std::cout << "Selected filename " << fileDialog.GetSelected().string() << std::endl;
-        fileDialog.ClearSelected();
-    }
-}
+    file_dialog.Display();
 
-void graphic::openFiles(){
-    
-    
+    if(file_dialog.HasSelected()){
+        std::cout << "Selected filename " << file_dialog.GetSelected().string() << std::endl;
+        rom_file = file_dialog.GetSelected().string();
+        chip.read_rom(rom_file.c_str());
+        file_dialog.ClearSelected();
+    }
+        
 }
