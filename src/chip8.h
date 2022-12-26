@@ -1,14 +1,15 @@
 #pragma once
 
+#include <bits/stdc++.h>
+
 class chip8{
 public:
-
-    //variables
+    // variables
     unsigned short opcode;
     unsigned char memory[4096];
-    unsigned char reg[16];
+    unsigned char V[16];
 
-    unsigned short pc;
+    unsigned short pc = 0x200;
     unsigned short I;
 
     unsigned char disp[64*32];
@@ -21,13 +22,17 @@ public:
 
     unsigned char key[16];
 
-    //functions
+    // functions
     void init();
     void read_rom(const char* rom_file);
+    void emulate_cycle();
 
 private:
+    // variables
 
-    //functions
+
+    // functions
     void clear(unsigned char* stuff, int size);
-    
+    void execute_opcode(unsigned short opcode);
+    void draw_pixel(uint8_t x, uint8_t y);
 };

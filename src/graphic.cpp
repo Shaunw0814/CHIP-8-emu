@@ -83,7 +83,7 @@ void graphic::setup(chip8 chip){
         }
         
         if(show_process){
-            makeProcess(); 
+            makeProcess(chip); 
         }
 
         if(show_config){
@@ -109,63 +109,84 @@ void graphic::setup(chip8 chip){
 }
 
 void graphic::makeDisplay(chip8 chip){
-
+    // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
-    
-    ImVec2 pixel_start, pixel_end;
 
-    pixel_start = pixel_end;
-    pixel_end.x += 10;
-    pixel_end.y += 10;
-
+    // Window - Graphics
     ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
     {
+        // Get the current window's draw list
+        ImDrawList* draw_list = ImGui::GetWindowDrawList();
+        
         for(int i = 0; i < (int)sizeof(chip.disp); i++){
-            if(chip.disp[i] == 0){
-                ImGui::GetForegroundDrawList()->AddRectFilled(pixel_start, pixel_end, IM_COL32(255, 255, 255, 255));
+            if(chip.disp[i] != 0){
+                // Calculate the x and y coordinates of the pixel
+                int x = i % 64;
+                int y = i / 64;
+
+                // Add a pixel
+                draw_list->AddRectFilled(ImVec2(x * 10, y * 10), ImVec2(x * 10 + 10, y * 10 + 10), IM_COL32_WHITE);
             }
         }
     }
     ImGui::End();
 }
 
-void graphic::makeProcess(){
+void graphic::makeProcess(chip8 &chip){
+    // Processor information window calculation
     ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px});
     ImGui::SetNextWindowPos({(float)width_px / 2, 0});
 
+    // Window - Processor Information
     ImGui::Begin("Processor Information", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     {
-        
+        ImGui::Text("Program counter: %d", chip.pc);
     }
     ImGui::End();
 }
 
 void graphic::makeConfig(ImGui::FileBrowser &file_dialog, chip8 &chip){
+    // Config window calculation
     ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 320});
 
+    // Window - Config
     ImGui::Begin("Config", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     {
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         
-        //Button for ROM choosing
+        // Button for ROM choosing
         if(ImGui::Button("Choose ROM")){
             file_dialog.Open();
         }
+        
+        ImGui::SameLine();
+
+        // Button for beginning cycle
+        if(rom_file != ""){
+            if(ImGui::Button("Read Rom")){
+                chip.read_rom(rom_file.c_str());
+            }
+
+            if(ImGui::Button("Emulate Cycle")){
+                chip.emulate_cycle();
+            }
+        }
+        
         const char* rom_print = rom_file == "" ? "(null)" : rom_file.c_str();
         ImGui::Text("Rom Path: %s", rom_print);
     }
     ImGui::End();
 
-    //choosing ROM file
+    // Choosing ROM file
     file_dialog.Display();
 
     if(file_dialog.HasSelected()){
         std::cout << "Selected filename " << file_dialog.GetSelected().string() << std::endl;
         rom_file = file_dialog.GetSelected().string();
-        chip.read_rom(rom_file.c_str());
         file_dialog.ClearSelected();
+        chip.pc = 0x200;
     }
         
 }

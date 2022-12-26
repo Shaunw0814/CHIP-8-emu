@@ -19,7 +19,7 @@ public:
     //graphic functions
     void setup(chip8 chip);
     void makeDisplay(chip8 chip);
-    void makeProcess();
+    void makeProcess(chip8 &chip);
     void makeConfig(ImGui::FileBrowser &file_dialog, chip8 &chip);
 
 private:
