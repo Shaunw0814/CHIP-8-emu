@@ -13,6 +13,8 @@ public:
     bool show_process = true;
     bool show_config = true;
 
+    bool emulate = false;
+
     ImGui::FileBrowser file_dialog;
     std::string rom_file;
 

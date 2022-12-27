@@ -3,6 +3,8 @@
 
 #include <bits/stdc++.h>
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 void chip8::init(){
     //resetting values
@@ -14,6 +16,8 @@ void chip8::init(){
     clear(disp, sizeof(disp));
     clear(V, sizeof(V));
     clear(memory, sizeof(memory));
+    
+    memset(stack, 0, sizeof(stack));
 }
 
 void chip8::clear(unsigned char* stuff, int size){
@@ -21,9 +25,10 @@ void chip8::clear(unsigned char* stuff, int size){
 }
 
 void chip8::emulate_cycle(){
-    if(pc < sizeof(memory)){
+    while(pc < sizeof(memory)){
         opcode = (memory[pc] << 8) | memory[pc+1];
         execute_opcode(opcode);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
 
@@ -36,6 +41,10 @@ void chip8::read_rom(const char* rom_file){
     input.close();
 
     std::cout << rom_file << " read in and stored to memory\n";
+
+    std::thread emu_thread(&chip8::emulate_cycle, this);
+
+    emu_thread.detach();
 
 }
 
@@ -207,14 +216,14 @@ void chip8::execute_opcode(unsigned short opcode){
         case 0xE:
             switch(third_nibble){
                 case 0x9:
-                    std::cout << "E. if iskeydown " << V[(int)second_nibble] << "\n";
-                    if(ImGui::IsKeyDown(V[(int)second_nibble])){
+                    std::cout << "E. if iskeydown " << ImGui::GetKeyName(key[V[second_nibble]]) << "\n";
+                    if(ImGui::IsKeyDown(key[V[second_nibble]])){
                         pc += 2;
                     }
                     break;
                 case 0xA:
-                    std::cout << "E. if !iskeydown " << V[(int)second_nibble] << "\n";
-                    if(!ImGui::IsKeyDown(V[(int)second_nibble])){
+                    std::cout << "E. if !iskeydown " << ImGui::GetKeyName(key[V[second_nibble]]) << "\n";
+                    if(!ImGui::IsKeyDown(key[V[second_nibble]])){
                         pc += 2;
                     }
                     break;
@@ -228,15 +237,27 @@ void chip8::execute_opcode(unsigned short opcode){
             switch(opcode & 0x00FF){
                 case 0x07:
                     std::cout << "F. V" << (int)second_nibble << " = delay timer\n";
+                    V[second_nibble] = delay_timer;
                     break;
                 case 0x0A:
                     std::cout << "F. wait for key press, store value of key in V" << (int)second_nibble << "n";
+                    kp = false;
+                    while(!kp){
+                        for(int i = 0; i < 16; i++){
+                            if(ImGui::IsKeyPressed(ImGui::GetKeyIndex(key[i]))){
+                                V[second_nibble] = i;
+                                break;
+                            }
+                        }
+                    }
                     break;
                 case 0x15:
                     std::cout << "F. set delay timer = V" << (int)second_nibble << "\n";
+                    delay_timer = V[second_nibble];
                     break;
                 case 0x18: 
                     std::cout << "F. set sound timer = V" << (int)second_nibble << "\n";
+                    sound_timer = V[second_nibble];
                     break;
                 case 0x1E:
                     std::cout << "F. I = I + V" << (int)second_nibble << "\n";
@@ -244,15 +265,25 @@ void chip8::execute_opcode(unsigned short opcode){
                     break;
                 case 0x29:
                     std::cout << "F. set I = location of sprite for digit V" << (int)second_nibble << "\n";
+                    I = V[second_nibble];
                     break;
                 case 0x33:
-                    std::cout << "F. store BCD representation of V" << (int)second_nibble << " in mem locations, I , I+1, and I+2 \n";
+                    std::cout << "F. store Binary-coded decimal representation of V" << (int)second_nibble << " in mem locations, I , I+1, and I+2 \n";
+                    memory[I] = V[second_nibble] / 100;
+                    memory[I + 1] = V[second_nibble] / 10 % 10;
+                    memory[I + 2] = V[second_nibble] % 10;
                     break;
                 case 0x55:
                     std::cout << "F. store registers V0 through V" << (int)second_nibble << " in memory starting at location I \n";
+                    for(int i = 0; i <= second_nibble; i++){
+                        memory[I + i] = V[i];
+                    }
                     break;
                 case 0x65:
                     std::cout << "F. read registers V0 through V" << (int)second_nibble << " from memory location starting at location I\n";
+                    for(int i = 0; i <= second_nibble; i++){
+                        V[i] = memory[I + i];
+                    }
                     break;
                 default:
                     std::cout << "F. unaccounted for opcode\n";

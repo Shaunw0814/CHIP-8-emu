@@ -90,6 +90,13 @@ void graphic::setup(chip8 chip){
             makeConfig(file_dialog, chip);
         }
 
+        // if(emulate){
+        //     while(chip.pc < sizeof(chip.memory)){
+        //         chip.emulate_cycle();
+        //         std::this_thread::sleep_for(std::chrono::seconds(1));
+        //     }
+        // }
+        
         // Rendering
         ImGui::Render();
         glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
@@ -141,7 +148,8 @@ void graphic::makeProcess(chip8 &chip){
     // Window - Processor Information
     ImGui::Begin("Processor Information", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     {
-        ImGui::Text("Program counter: %d", chip.pc);
+        ImGui::BeginChild("Index", ImVec2((width_px / 4) - 13, height_px / 2), true);
+
         ImGui::Text("Index: %d", chip.I);
         ImGui::Text("V0: %d", chip.V[0]);
         ImGui::Text("V1: %d", chip.V[1]);
@@ -159,8 +167,40 @@ void graphic::makeProcess(chip8 &chip){
         ImGui::Text("VD: %d", chip.V[13]);
         ImGui::Text("VE: %d", chip.V[14]);
         ImGui::Text("VF: %d", chip.V[15]);
+        
+        ImGui::EndChild();
 
 
+        ImGui::SameLine();
+
+
+        ImGui::BeginChild("Stack", ImVec2((width_px / 4) - 13, height_px / 2), true);
+
+        ImGui::Text("Stack: %d", chip.I);
+        ImGui::Text("S0: %d", chip.stack[0]);
+        ImGui::Text("S1: %d", chip.stack[1]);
+        ImGui::Text("S2: %d", chip.stack[2]);
+        ImGui::Text("S3: %d", chip.stack[3]);
+        ImGui::Text("S4: %d", chip.stack[4]);
+        ImGui::Text("S5: %d", chip.stack[5]);
+        ImGui::Text("S6: %d", chip.stack[6]);
+        ImGui::Text("S7: %d", chip.stack[7]);
+        ImGui::Text("S8: %d", chip.stack[8]);
+        ImGui::Text("S9: %d", chip.stack[9]);
+        ImGui::Text("SA: %d", chip.stack[10]);
+        ImGui::Text("SB: %d", chip.stack[11]);
+        ImGui::Text("SC: %d", chip.stack[12]);
+        ImGui::Text("SD: %d", chip.stack[13]);
+        ImGui::Text("SE: %d", chip.stack[14]);
+        ImGui::Text("SF: %d", chip.stack[15]);
+
+        ImGui::EndChild();
+
+        ImGui::BeginChild("");
+
+        ImGui::Text("Program counter: %d", chip.pc);
+
+        ImGui::EndChild();
     }
     ImGui::End();
 }
@@ -186,10 +226,6 @@ void graphic::makeConfig(ImGui::FileBrowser &file_dialog, chip8 &chip){
         if(rom_file != ""){
             if(ImGui::Button("Read Rom")){
                 chip.read_rom(rom_file.c_str());
-            }
-
-            if(ImGui::Button("Emulate Cycle")){
-                chip.emulate_cycle();
             }
         }
         
