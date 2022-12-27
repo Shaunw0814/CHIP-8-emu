@@ -29,10 +29,14 @@ void chip8::emulate_cycle(){
 
 void chip8::read_rom(const char* rom_file){
 
+    init();
+
     std::ifstream input(rom_file, std::ios::binary);
     input.read((char*)&memory[0x200], sizeof(memory) - 0x200);
     input.close();
-    
+
+    std::cout << rom_file << " read in and stored to memory\n";
+
 }
 
 void chip8::execute_opcode(unsigned short opcode){
@@ -53,6 +57,7 @@ void chip8::execute_opcode(unsigned short opcode){
             }
             else if(third_nibble == 0xE && fourth_nibble == 0xE){
                 std::cout << "0. return from a subroutine\n";
+                pc = stack[--sp];
             }
             else{
                 std::cout << "0. Execute machine language subroutine at address " << (int)second_nibble << (int)third_nibble << (int)fourth_nibble << " [CAN IGNORE] \n";
@@ -61,25 +66,25 @@ void chip8::execute_opcode(unsigned short opcode){
             break;
         
         case 0x1:
-            std::cout << "1. jump to address " << (int)second_nibble << (int)third_nibble << (int)fourth_nibble << "\n";
+            std::cout << "1. jump to address " << (int)(opcode & 0x0FFF) << "\n";
             pc = opcode & 0x0FFF;
             break;
         
         case 0x2:
-            std::cout << "2. execute subroutine at address " << (int)second_nibble << (int)third_nibble << (int)fourth_nibble << "\n";
+            std::cout << "2. execute subroutine at address " << (int)(opcode & 0x0FFF) << "\n";
             stack[++sp] = pc;
             pc = opcode & 0x0FFF;
             break;
         
         case 0x3:
-            std::cout << "3. skip next instruction if V" << (int)second_nibble << " == " << (int)third_nibble << (int)fourth_nibble << "\n";
+            std::cout << "3. skip next instruction if V" << (int)second_nibble << " == " << (int)(opcode & 0x00FF) << "\n";
             if(V[second_nibble] == (opcode & 0x00FF)){
                 pc += 2;
             }
             break;
         
         case 0x4:
-            std::cout << "4. skip next instruction if V" << (int)second_nibble << " != " << (int)third_nibble << (int)fourth_nibble << "\n";
+            std::cout << "4. skip next instruction if V" << (int)second_nibble << " != " << (int)(opcode & 0x00FF) << "\n";
             if(V[second_nibble] != (opcode & 0x00FF)){
                 pc += 2;
             }
@@ -93,12 +98,12 @@ void chip8::execute_opcode(unsigned short opcode){
             break;
 
         case 0x6:
-            std::cout << "6. store number " << (int)third_nibble << (int)fourth_nibble << " in V" << (int)second_nibble << "\n";
+            std::cout << "6. store number " << (int)(opcode & 0x00FF) << " in V" << (int)second_nibble << "\n";
             V[second_nibble] = (opcode & 0x00FF);
             break;
 
         case 0x7:
-            std::cout << "7. add number " << (int)third_nibble << (int)fourth_nibble << " in V" << (int)second_nibble << "\n";
+            std::cout << "7. add number " << (int)(opcode & 0x00FF) << " in V" << (int)second_nibble << "\n";
             V[second_nibble] += (opcode & 0x00FF);
             break;
 
@@ -171,6 +176,7 @@ void chip8::execute_opcode(unsigned short opcode){
 
             }
             break;
+
         case 0x9:
             std::cout << "9. skip if V" << (int)second_nibble << " != V" << (int)third_nibble << "\n";
             if(V[second_nibble] != V[third_nibble]){
@@ -179,44 +185,81 @@ void chip8::execute_opcode(unsigned short opcode){
             break;
 
         case 0xA:
-            std::cout << "A. store memory address " << (int)second_nibble << (int)third_nibble << (int)fourth_nibble << " in register index \n";
+            std::cout << "A. store memory address " << (int)(opcode & 0x0FFF) << " in register index \n";
             I = opcode & 0x0FFF;
-            pc += 2;
             break;
 
         case 0xB:
-            std::cout << "B. jump to address " << (int)second_nibble << (int)third_nibble << (int)fourth_nibble  << " + V0" << "\n";
-            pc += (opcode & 0x0FFF) + V[0];
+            std::cout << "B. jump to address " << (int)(opcode & 0x0FFF)  << " + V0" << "\n";
+            pc = (opcode & 0x0FFF) + V[0];
             break;
 
         case 0xC:
-            std::cout << "C. set V" << (int)second_nibble << "to a random number with a mask of " << (int)third_nibble << (int)fourth_nibble << " + V0" << "\n";
+            std::cout << "C. set V" << (int)second_nibble << "to a random number with a mask of " << (int)(opcode & 0x00FF) << " + V0" << "\n";
             V[second_nibble] = (std::rand() & 256) & (opcode & 0x00FF);
             break;
 
         case 0xD:
             std::cout << "D. Draw a sprite at position " << (int)second_nibble << ", " << (int)third_nibble << " with " << (int)fourth_nibble << " bytes of sprite data starting at the address stored in I. Set Vf to 01 if any pixels are changed to unset, and 00 otherwise \n";
-            draw_pixel((int)second_nibble, (int)third_nibble);
+            draw_pixel((int)second_nibble, (int)third_nibble, (int)fourth_nibble);
             break;
 
         case 0xE:
             switch(third_nibble){
                 case 0x9:
+                    std::cout << "E. if iskeydown " << V[(int)second_nibble] << "\n";
                     if(ImGui::IsKeyDown(V[(int)second_nibble])){
                         pc += 2;
                     }
                     break;
                 case 0xA:
+                    std::cout << "E. if !iskeydown " << V[(int)second_nibble] << "\n";
                     if(!ImGui::IsKeyDown(V[(int)second_nibble])){
                         pc += 2;
                     }
                     break;
+                default:
+                    std::cout << "E. unaccounted opcode" << "\n";
+                    break;
             }
-            std::cout << "E. Skip ???\n";
             break;
+
         case 0xF:
-            std::cout << "F. stuff\n";
+            switch(opcode & 0x00FF){
+                case 0x07:
+                    std::cout << "F. V" << (int)second_nibble << " = delay timer\n";
+                    break;
+                case 0x0A:
+                    std::cout << "F. wait for key press, store value of key in V" << (int)second_nibble << "n";
+                    break;
+                case 0x15:
+                    std::cout << "F. set delay timer = V" << (int)second_nibble << "\n";
+                    break;
+                case 0x18: 
+                    std::cout << "F. set sound timer = V" << (int)second_nibble << "\n";
+                    break;
+                case 0x1E:
+                    std::cout << "F. I = I + V" << (int)second_nibble << "\n";
+                    I += second_nibble;
+                    break;
+                case 0x29:
+                    std::cout << "F. set I = location of sprite for digit V" << (int)second_nibble << "\n";
+                    break;
+                case 0x33:
+                    std::cout << "F. store BCD representation of V" << (int)second_nibble << " in mem locations, I , I+1, and I+2 \n";
+                    break;
+                case 0x55:
+                    std::cout << "F. store registers V0 through V" << (int)second_nibble << " in memory starting at location I \n";
+                    break;
+                case 0x65:
+                    std::cout << "F. read registers V0 through V" << (int)second_nibble << " from memory location starting at location I\n";
+                    break;
+                default:
+                    std::cout << "F. unaccounted for opcode\n";
+                    break;
+            }
             break;
+
         default:
             std::cout << "Unknown opcode" << std::endl;
             break;
@@ -225,6 +268,24 @@ void chip8::execute_opcode(unsigned short opcode){
     pc += 2;
 }
 
-void chip8::draw_pixel(uint8_t x, uint8_t y){
-    disp[(x * 64) + y] = 1;
+void chip8::draw_pixel(int reg_x, int reg_y, int height){
+    auto x = V[reg_x];
+    auto y = V[reg_y];
+    V[0xF] = 0;
+
+    for(int yline = 0; yline < height; yline++){
+        auto pixel = memory[I + yline];
+
+        for (int xline = 0; xline < 8; xline++)
+        {
+            if ((pixel & (0x80 >> xline)) != 0)
+            {
+                if (disp[(x + xline + ((y + yline) * 64))] == 1)
+                {
+                    V[0xF] = 1;
+                }
+                disp[x + xline + ((y + yline) * 64)] ^= 1;
+            }
+        }
+    }
 }

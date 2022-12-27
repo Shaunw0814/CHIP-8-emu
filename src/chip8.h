@@ -34,5 +34,5 @@ private:
     // functions
     void clear(unsigned char* stuff, int size);
     void execute_opcode(unsigned short opcode);
-    void draw_pixel(uint8_t x, uint8_t y);
+    void draw_pixel(int reg_x, int reg_y, int height);
 };

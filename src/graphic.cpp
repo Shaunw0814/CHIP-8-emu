@@ -142,6 +142,25 @@ void graphic::makeProcess(chip8 &chip){
     ImGui::Begin("Processor Information", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     {
         ImGui::Text("Program counter: %d", chip.pc);
+        ImGui::Text("Index: %d", chip.I);
+        ImGui::Text("V0: %d", chip.V[0]);
+        ImGui::Text("V1: %d", chip.V[1]);
+        ImGui::Text("V2: %d", chip.V[2]);
+        ImGui::Text("V3: %d", chip.V[3]);
+        ImGui::Text("V4: %d", chip.V[4]);
+        ImGui::Text("V5: %d", chip.V[5]);
+        ImGui::Text("V6: %d", chip.V[6]);
+        ImGui::Text("V7: %d", chip.V[7]);
+        ImGui::Text("V8: %d", chip.V[8]);
+        ImGui::Text("V9: %d", chip.V[9]);
+        ImGui::Text("VA: %d", chip.V[10]);
+        ImGui::Text("VB: %d", chip.V[11]);
+        ImGui::Text("VC: %d", chip.V[12]);
+        ImGui::Text("VD: %d", chip.V[13]);
+        ImGui::Text("VE: %d", chip.V[14]);
+        ImGui::Text("VF: %d", chip.V[15]);
+
+
     }
     ImGui::End();
 }
