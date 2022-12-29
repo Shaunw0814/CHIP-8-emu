@@ -25,7 +25,7 @@ void chip8::clear(unsigned char* stuff, int size){
 }
 
 void chip8::emulate_cycle(){
-    while(pc < sizeof(memory)){
+    while(pc < sizeof(memory) && emulate){
         opcode = (memory[pc] << 8) | memory[pc+1];
         execute_opcode(opcode);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -65,7 +65,7 @@ void chip8::execute_opcode(unsigned short opcode){
                 clear(disp, sizeof(disp));
             }
             else if(third_nibble == 0xE && fourth_nibble == 0xE){
-                std::cout << "0. return from a subroutine\n";
+                std::cout << "0. return from a subroutine " << sp << "\n";
                 pc = stack[--sp];
             }
             else{
@@ -77,11 +77,12 @@ void chip8::execute_opcode(unsigned short opcode){
         case 0x1:
             std::cout << "1. jump to address " << (int)(opcode & 0x0FFF) << "\n";
             pc = opcode & 0x0FFF;
+            pc -= 2;
             break;
         
         case 0x2:
             std::cout << "2. execute subroutine at address " << (int)(opcode & 0x0FFF) << "\n";
-            stack[++sp] = pc;
+            stack[sp++] = pc;
             pc = opcode & 0x0FFF;
             break;
         
@@ -240,13 +241,13 @@ void chip8::execute_opcode(unsigned short opcode){
                     V[second_nibble] = delay_timer;
                     break;
                 case 0x0A:
-                    std::cout << "F. wait for key press, store value of key in V" << (int)second_nibble << "n";
+                    std::cout << "F. wait for key press, store value of key in V" << (int)second_nibble << "\n";
                     kp = false;
                     while(!kp){
                         for(int i = 0; i < 16; i++){
                             if(ImGui::IsKeyPressed(ImGui::GetKeyIndex(key[i]))){
                                 V[second_nibble] = i;
-                                break;
+                                kp = true;
                             }
                         }
                     }

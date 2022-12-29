@@ -176,7 +176,7 @@ void graphic::makeProcess(chip8 &chip){
 
         ImGui::BeginChild("Stack", ImVec2((width_px / 4) - 13, height_px / 2), true);
 
-        ImGui::Text("Stack: %d", chip.I);
+        ImGui::Text("Stack: ");
         ImGui::Text("S0: %d", chip.stack[0]);
         ImGui::Text("S1: %d", chip.stack[1]);
         ImGui::Text("S2: %d", chip.stack[2]);
@@ -199,6 +199,9 @@ void graphic::makeProcess(chip8 &chip){
         ImGui::BeginChild("");
 
         ImGui::Text("Program counter: %d", chip.pc);
+        ImGui::Text("Current opcode: 0x%x", chip.opcode);
+        ImGui::Text("Stack Pointer: %d", chip.sp);
+        ImGui::Text("Emulate: ");
 
         ImGui::EndChild();
     }

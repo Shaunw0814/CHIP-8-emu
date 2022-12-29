@@ -42,6 +42,7 @@ public:
     };
 
     bool kp = false;
+    bool emulate = true;
 
     // Keypad       Keyboard
     // +-+-+-+-+    +-+-+-+-+
