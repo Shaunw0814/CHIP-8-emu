@@ -14,7 +14,7 @@
 #include "graphic.h"
 #include "chip8.h"
 
-void graphic::setup(chip8 chip){
+void graphic::setup(chip8 &chip){
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
     {
         printf("Error: %s\n", SDL_GetError());
@@ -115,7 +115,7 @@ void graphic::setup(chip8 chip){
     SDL_Quit();
 }
 
-void graphic::makeDisplay(chip8 chip){
+void graphic::makeDisplay(chip8 &chip){
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
@@ -196,14 +196,11 @@ void graphic::makeProcess(chip8 &chip){
 
         ImGui::EndChild();
 
-        ImGui::BeginChild("");
-
         ImGui::Text("Program counter: %d", chip.pc);
         ImGui::Text("Current opcode: 0x%x", chip.opcode);
         ImGui::Text("Stack Pointer: %d", chip.sp);
-        ImGui::Text("Emulate: ");
 
-        ImGui::EndChild();
+        
     }
     ImGui::End();
 }
@@ -229,6 +226,23 @@ void graphic::makeConfig(ImGui::FileBrowser &file_dialog, chip8 &chip){
         if(rom_file != ""){
             if(ImGui::Button("Read Rom")){
                 chip.read_rom(rom_file.c_str());
+                chip.prompt = true;
+                chip.emulate = true;
+            }
+
+            if(chip.prompt){
+                ImGui::Text("Emulate: ");
+
+                ImGui::SameLine();
+
+                if(ImGui::SmallButton(chip.emulate == true ? "Pause" : "Continue")){
+                    chip.emulate = !chip.emulate;
+                    if(chip.emulate){
+                        chip.cv.notify_one();
+                    }
+                }
+
+                ImGui::Text("Made by Shaun Wang using ImGui");
             }
         }
         

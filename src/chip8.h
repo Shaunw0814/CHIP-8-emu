@@ -4,6 +4,7 @@
 
 #include <bits/stdc++.h>
 
+
 class chip8{
 public:
     // variables
@@ -42,7 +43,12 @@ public:
     };
 
     bool kp = false;
-    bool emulate = true;
+    bool emulate = false;
+    bool prompt = false;
+
+    std::mutex emulate_mutex;
+    std::condition_variable cv;
+
 
     // Keypad       Keyboard
     // +-+-+-+-+    +-+-+-+-+
@@ -57,13 +63,15 @@ public:
 
 
     // functions
+    chip8() : emulate(true) {}
+
     void init();
     void read_rom(const char* rom_file);
     void emulate_cycle();
 
 private:
     // variables
-
+    
 
     // functions
     void clear(unsigned char* stuff, int size);

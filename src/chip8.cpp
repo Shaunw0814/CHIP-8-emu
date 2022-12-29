@@ -25,7 +25,11 @@ void chip8::clear(unsigned char* stuff, int size){
 }
 
 void chip8::emulate_cycle(){
-    while(pc < sizeof(memory) && emulate){
+    while(pc < sizeof(memory)){
+        //check for emulate variable
+        std::unique_lock<std::mutex> lock(emulate_mutex);
+        cv.wait(lock, [this](){ return emulate; });
+
         opcode = (memory[pc] << 8) | memory[pc+1];
         execute_opcode(opcode);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -42,10 +46,8 @@ void chip8::read_rom(const char* rom_file){
 
     std::cout << rom_file << " read in and stored to memory\n";
 
-    std::thread emu_thread(&chip8::emulate_cycle, this);
-
-    emu_thread.detach();
-
+    std::thread emulate_thread(&chip8::emulate_cycle, this);
+    emulate_thread.detach();
 }
 
 void chip8::execute_opcode(unsigned short opcode){
