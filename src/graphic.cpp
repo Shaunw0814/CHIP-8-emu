@@ -200,6 +200,8 @@ void graphic::makeProcess(chip8 &chip){
         ImGui::Text("Current opcode: 0x%x", chip.opcode);
         ImGui::Text("Stack Pointer: %d", chip.sp);
 
+        ImGui::Text("Current Cycle: %d", chip.cycle);
+
 
         ImVec2 text_pos((float)width_px / 3 - ImGui::CalcTextSize("Made by Shaun Wang using ImGui").x, (float)height_px - ImGui::GetTextLineHeightWithSpacing() - 20);
         ImGui::SetCursorPos(text_pos);

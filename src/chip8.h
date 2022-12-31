@@ -42,14 +42,6 @@ public:
         ImGuiKey_V        // Key code F: "V"
     };
 
-    bool kp = false;
-    bool emulate = false;
-    bool prompt = false;
-
-    std::mutex emulate_mutex;
-    std::condition_variable cv;
-
-
     // Keypad       Keyboard
     // +-+-+-+-+    +-+-+-+-+
     // |1|2|3|C|    |1|2|3|4|
@@ -61,6 +53,14 @@ public:
     // |A|0|B|F|    |Z|X|C|V|
     // +-+-+-+-+    +-+-+-+-+
 
+    bool kp = false;
+    bool emulate = false;
+    bool prompt = false;
+
+    std::mutex emulate_mutex;
+    std::condition_variable cv;
+
+    int cycle = 0;
 
     // functions
     chip8() : emulate(true) {}

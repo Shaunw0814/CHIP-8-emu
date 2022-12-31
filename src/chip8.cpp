@@ -32,6 +32,7 @@ void chip8::emulate_cycle(){
 
         opcode = (memory[pc] << 8) | memory[pc+1];
         execute_opcode(opcode);
+        cycle++;
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
@@ -45,6 +46,7 @@ void chip8::read_rom(const char* rom_file){
     input.close();
 
     std::cout << rom_file << " read in and stored to memory\n";
+    cycle = 0;
 
     std::thread emulate_thread(&chip8::emulate_cycle, this);
     emulate_thread.detach();
