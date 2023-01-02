@@ -88,6 +88,7 @@ void chip8::execute_opcode(unsigned short opcode){
             std::cout << "2. execute subroutine at address " << (int)(opcode & 0x0FFF) << "\n";
             stack[sp++] = pc;
             pc = opcode & 0x0FFF;
+            pc -= 2;
             break;
         
         case 0x3:
@@ -266,7 +267,7 @@ void chip8::execute_opcode(unsigned short opcode){
                     break;
                 case 0x1E:
                     std::cout << "F. I = I + V" << (int)second_nibble << "\n";
-                    I += second_nibble;
+                    I += V[second_nibble];
                     break;
                 case 0x29:
                     std::cout << "F. set I = location of sprite for digit V" << (int)second_nibble << "\n";
