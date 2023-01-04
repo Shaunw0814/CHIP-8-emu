@@ -11,3 +11,5 @@ Using https://github.com/Timendus/chip8-test-suite for test suite
 
 
 To try it out, clone the repo and enter the src file. Using the makefile create the abc program which is the runnable file for my chip8 interpreter. For controls and other information, please refer to the Timendus chip8 test suite.
+
+If you would like to debug it and check out the opcodes that run, uncomment/adjust line 36 in chip8.cpp under src
