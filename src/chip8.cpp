@@ -33,7 +33,7 @@ void chip8::emulate_cycle(){
         opcode = (memory[pc] << 8) | memory[pc+1];
         execute_opcode(opcode);
         cycle++;
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
 
@@ -107,7 +107,7 @@ void chip8::execute_opcode(unsigned short opcode){
         
         case 0x5:
             std::cout << "5. skip if V" << (int)second_nibble << " == V" << (int)third_nibble << "\n";
-            if(V[second_nibble == V[third_nibble]]){
+            if(V[second_nibble] == V[third_nibble]){
                 pc += 2;
             }
             break;
@@ -163,7 +163,7 @@ void chip8::execute_opcode(unsigned short opcode){
                     else{
                         V[0xF] = 0;
                     }
-                    V[second_nibble] = V[third_nibble] - V[second_nibble];
+                    V[second_nibble] = V[second_nibble] - V[third_nibble];
                     break;
 
                 case 0x6:
